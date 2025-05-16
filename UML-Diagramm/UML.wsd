@@ -25,6 +25,8 @@ abstract class CasinospielBasis {
 
 
 class BlackJackGame extends CasinospielBasis{
+    - Scanner sc;
+    - GamePhases gamePhase;
     - String[] cards;
     - String[] prefix;
     - String[] deck;
@@ -50,5 +52,10 @@ class BlackJackGame extends CasinospielBasis{
     + createDeck(): void;
 }
 
+class GamePhases {
+    + enum GamePhases;
+}
+
 Spieler --> CasinospielBasis : "has a"
+GamePhases --> BlackJackGame: "has a"
 @enduml
