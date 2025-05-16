@@ -94,7 +94,8 @@ public class BlackJackGame extends CasinospielBasis{
                     eingabe = sc.nextLine();
                     continue;
                 }
-                if (numInput > super.spieler.getJetons()) {
+                if (numInput > super.spieler.getJetons() || numInput < 0) {
+                    System.err.println("Du musst mindestens 1 Jeton setzen!");
                     System.err.println("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
                     System.out.println("Neue Eingabe: ");
                     eingabe = sc.nextLine();
@@ -102,7 +103,9 @@ public class BlackJackGame extends CasinospielBasis{
                 }
                 checkInput = false;
             }
-            System.out.println("Erfolgreich " + numInput);
+            this.playerBet = numInput;
+            System.out.println("Du hast " + numInput + " Jetons gesetzt.");
+            this.gamePhase = GamePhases.GetCards;
         }
         return "";
     }
