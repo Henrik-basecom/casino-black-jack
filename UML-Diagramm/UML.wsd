@@ -1,0 +1,54 @@
+@startuml BlackJack
+class Spieler {
+    - String name;
+    - int jetons;
+
+    + Spieler(String name, int startJetons);
+
+    + getName(): String;
+    + getJetons(): int;
+    + addJetons(int betrag): void;
+    + removeJetons(int betrag): void;
+}
+
+abstract class CasinospielBasis {
+    # Spieler player;
+    - String name;
+
+    + CasinospielBasis(String name, Spieler player);
+
+    + getName(): String;
+    + ersteNachricht(): String;
+    + verarbeiteEingabe(String input): String;
+    + neuesSpiel(): void;
+}
+
+
+class BlackJackGame extends CasinospielBasis{
+    - String[] cards;
+    - String[] prefix;
+    - String[] deck;
+    - String[] handDealer;
+    - String[] handPlayer; 
+    - int playerBet;
+
+    + BlackJackGame(Spieler player): void;
+
+    + getPlayerBet(): int;
+    + setPlayerBet(int bet): void;
+    + getHand(String hand): String[];
+    + getDeck(): String[];
+    + getRandomCard(): String;
+    + removeDeckCard(String card): void;
+    + addCardToHand(String card, String hand): void;
+    + resetDeck(): void;
+    + resetHand(String hand): void;
+    + calculateHand(String hand): int;
+    + gameResult(): void;
+    + playerTurn(): void;
+    + dealerTurn(): void;
+    + createDeck(): void;
+}
+
+Spieler --> CasinospielBasis : "has a"
+@enduml
