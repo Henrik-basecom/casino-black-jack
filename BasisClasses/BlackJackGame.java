@@ -3,8 +3,8 @@ import java.util.Scanner;
 public class BlackJackGame extends CasinospielBasis{
     private Scanner sc = new Scanner(System.in);
     private GamePhases gamePhase = GamePhases.WelcomeAndBet;
-    private String[] cards;
-    private String[] prefix;
+    private String[] cards = {"2","3","4","5","6","7","8","9","10","Bube","Dame","König","ASS"};
+    private String[] prefix = {"♠","♥","♦","♣"};
     private String[] deck;
     private String[] handPlayer;
     private String[] handDealer;
@@ -13,6 +13,7 @@ public class BlackJackGame extends CasinospielBasis{
 
     public BlackJackGame(Spieler spieler) {
         super("BlackJack", spieler);
+
     }
 
 
@@ -75,9 +76,15 @@ public class BlackJackGame extends CasinospielBasis{
 
     @Override
     public String ersteNachricht() {
-        return "Willkommen bei BlackJack " + super.spieler.getName() + "\n"
-        + "Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons\n"
-        + "Bitte gib an wie viele Jetons du setzen möchtest: ";
+        return super.spieler.getName() + ", Willkommen bei \n" +
+                "┌───────┐   ┌───────┐\n" +
+                "│10     │   │A      │\n" +
+                "│   ♠   │   │  ♥    │\n" +
+                "│       │   │       │\n" +
+                "└───────┘   └───────┘\n" +
+                " B L A C K J A C K\n" +
+                "\nDu verfügst aktuell über " + super.spieler.getJetons() + " Jetons\n" +
+                "Bitte gib an wie viele Jetons du setzen möchtest: ";
     }
 
     @Override
@@ -106,6 +113,9 @@ public class BlackJackGame extends CasinospielBasis{
             this.playerBet = numInput;
             System.out.println("Du hast " + numInput + " Jetons gesetzt.");
             this.gamePhase = GamePhases.GetCards;
+        }
+        if (this.gamePhase == GamePhases.GetCards){
+            return null;
         }
         return "";
     }
