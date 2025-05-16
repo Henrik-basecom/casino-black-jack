@@ -1,0 +1,70 @@
+public class BlackJackGame {
+    String[] cards;
+    String[] prefix;
+    String[] deck;
+    String[] handPlayer;
+    String[] handDealer;
+    int playerBet;
+
+    public void BlackJackGame(Spieler player){
+
+    };
+
+    public int getPlayerBet() {
+        return playerBet;
+    }
+
+    public void setPlayerBet(int playerBet) {
+          this.playerBet = playerBet;
+    }
+
+    public String[] getHandPlayer() {
+        return handPlayer;
+    }
+
+    public String[] getDeck() {
+        return deck;
+    }
+
+    public String getRandomCard() {
+        return null;
+    }
+
+    public void removeDeckCard(String card){
+
+    }
+
+    public void addCardToHand(String card, String hand){
+
+    }
+
+    public void resetDeck(){
+
+    }
+
+    public void resetHand(){
+
+    }
+
+    public int calculateHand(String hand){
+        return 1;
+    }
+
+    public void gameResult(){
+
+    }
+
+    public void playerTurn(){
+
+    }
+
+    public void dealerTurn(){
+
+    }
+
+    public void createDeck(){
+
+    }
+
+
+}
