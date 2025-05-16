@@ -29,7 +29,7 @@ class BlackJackGame extends CasinospielBasis{
     - GamePhases gamePhase;
     - String[] cards;
     - String[] prefix;
-    - String[] deck;
+    - ArrayList<String> deck;
     - String[] handDealer;
     - String[] handPlayer; 
     - int playerBet;

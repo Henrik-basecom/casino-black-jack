@@ -1,11 +1,12 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class BlackJackGame extends CasinospielBasis{
     private Scanner sc = new Scanner(System.in);
     private GamePhases gamePhase = GamePhases.WelcomeAndBet;
     private String[] cards = {"2","3","4","5","6","7","8","9","10","Bube","Dame","König","ASS"};
-    private String[] prefix = {"♠","♥","♦","♣"};
-    private String[] deck;
+    private String[] prefixs = {"♠","♥","♦","♣"};
+    private ArrayList<String> deck = new ArrayList<String>();
     private String[] handPlayer;
     private String[] handDealer;
     private int playerBet;
@@ -13,7 +14,11 @@ public class BlackJackGame extends CasinospielBasis{
 
     public BlackJackGame(Spieler spieler) {
         super("BlackJack", spieler);
-
+        for (String prefix : prefixs) {
+            for (String card : cards) {
+                deck.add(prefix + " " + card);
+            }
+        }
     }
 
 
@@ -115,7 +120,7 @@ public class BlackJackGame extends CasinospielBasis{
             this.gamePhase = GamePhases.GetCards;
         }
         if (this.gamePhase == GamePhases.GetCards){
-            return null;
+            System.out.println(this.deck);
         }
         return "";
     }
