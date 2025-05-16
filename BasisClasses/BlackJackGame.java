@@ -1,4 +1,4 @@
-public class BlackJackGame {
+public class BlackJackGame extends CasinospielBasis{
     String[] cards;
     String[] prefix;
     String[] deck;
@@ -6,9 +6,10 @@ public class BlackJackGame {
     String[] handDealer;
     int playerBet;
 
-    public void BlackJackGame(Spieler player){
 
-    };
+    public BlackJackGame(String name, Spieler spieler) {
+        super(name, spieler);
+    }
 
     public int getPlayerBet() {
         return playerBet;
@@ -67,4 +68,18 @@ public class BlackJackGame {
     }
 
 
+    @Override
+    public String ersteNachricht() {
+        return "";
+    }
+
+    @Override
+    public String verarbeiteEingabe(String eingabe) {
+        return "";
+    }
+
+    @Override
+    public void neuesSpiel() {
+
+    }
 }
