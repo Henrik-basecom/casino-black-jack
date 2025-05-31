@@ -34,7 +34,7 @@ public class BlackJackGame extends CasinospielBasis{
         return handPlayer;
     }
 
-    public String[] getDeck() {
+    public ArrayList<String> getDeck() {
         return deck;
     }
 
@@ -119,8 +119,30 @@ public class BlackJackGame extends CasinospielBasis{
             System.out.println("Du hast " + numInput + " Jetons gesetzt.");
             this.gamePhase = GamePhases.GetCards;
         }
-        if (this.gamePhase == GamePhases.GetCards){
-            System.out.println(this.deck);
+
+
+        if (this.gamePhase == GamePhases.GetCards) {
+            // Initialisiere die Hände (je 2 Karten für Spieler, 2 für Dealer)
+            handPlayer = new String[2];
+            handDealer = new String[2];
+
+            // Spieler erhält 2 Karten (offen)
+            handPlayer[0] = getRandomCard();  // Erste Karte
+            handPlayer[1] = getRandomCard();  // Zweite Karte
+
+            // Dealer erhält 1 offene und 1 verdeckte Karte
+            handDealer[0] = getRandomCard();  // Offene Karte
+            handDealer[1] = "???";            // Verdeckte Karte (symbolisch)
+
+            // Ausgabe des aktuellen Spielstands
+            System.out.println("\n--- Karten wurden ausgeteilt ---");
+            System.out.println("Dealer zeigt: " + handDealer[0] + " + [???]");
+            System.out.println("Dein Blatt:   " + handPlayer[0] + " + " + handPlayer[1]);
+            System.out.println("Deine Punkte: " + calculateHand("player") + "\n");
+
+            // Wechsle zur nächsten Phase (Spieler-Entscheidung)
+            this.gamePhase = GamePhases.Decision;
+            System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
         }
         return "";
     }
