@@ -39,7 +39,13 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public String getRandomCard() {
-        return null;
+        if (deck.isEmpty()) {
+            resetDeck();
+        }
+        int randomIndex = (int) (Math.random() * deck.size());
+        String card = deck.get(randomIndex);
+        deck.remove(randomIndex);
+        return card;
     }
 
     public void removeDeckCard(String card){
@@ -51,15 +57,34 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public void resetDeck(){
-
+        deck.clear();
+        for (String prefix : prefixs) {
+            for (String card : cards) {
+                deck.add(prefix + " " + card);
+            }
+        }
     }
 
     public void resetHand(){
 
     }
 
-    public int calculateHand(String hand){
-        return 1;
+    public int calculateHand(String hand) {
+        String[] targetHand = hand.equals("player") ? handPlayer : handDealer;
+        int sum = 0;
+        for (String card : targetHand) {
+            if (card == null || card.equals("???")) continue; // Verdeckte Karte ignorieren
+
+            String value = card.split(" ")[1]; // Extrahieren des Kartenwerts (z.B. "♥ 10" → "10")
+            switch (value) {
+                case "ASS":   sum += 11; break; // ASS = 11 (später anpassbar für 1/11)
+                case "Bube":
+                case "Dame":
+                case "König": sum += 10; break;
+                default:      sum += Integer.parseInt(value); // Zahlenkarten (2-10)
+            }
+        }
+        return sum;
     }
 
     public void gameResult(){
