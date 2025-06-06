@@ -30,32 +30,40 @@ class BlackJackGame extends CasinospielBasis{
     - String[] cards;
     - String[] prefix;
     - ArrayList<String> deck;
-    - String[] handDealer;
-    - String[] handPlayer; 
+    - ArrayList<String> handDealer;
+    - ArrayList<String> handPlayer; 
     - int playerBet;
 
     + BlackJackGame(Spieler player): void;
 
     + getPlayerBet(): int;
     + setPlayerBet(int bet): void;
-    + getHand(String hand): String[];
-    + getDeck(): String[];
+    + getHand(GamePlayers player): ArrayList<String>;
     + getRandomCard(): String;
-    + removeDeckCard(String card): void;
-    + addCardToHand(String card, String hand): void;
     + resetDeck(): void;
-    + resetHand(String hand): void;
-    + calculateHand(String hand): int;
+    + resetHand(GamePlayers player): void;
+    + formatHandToString(GamePlayers player): String;
+    + calculateHand(GamePlayers player): int;
     + gameResult(): void;
     + playerTurn(): void;
     + dealerTurn(): void;
-    + createDeck(): void;
+    + checkJetonInput(String input): int;
 }
 
 class GamePhases {
     + enum GamePhases;
 }
 
+class GamePlayers {
+    + enum GamePlayers;
+}
+
+class GameResults {
+    + enum GameResults;
+}
+
 Spieler --> CasinospielBasis : "has a"
 GamePhases --> BlackJackGame: "has a"
+GamePlayers --> BlackJackGame: "has a"
+GameResults --> BlackJackGame: "has a"
 @enduml
