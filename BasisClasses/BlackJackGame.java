@@ -153,7 +153,7 @@ public class BlackJackGame extends CasinospielBasis{
 
     public void dealerTurn(){
         System.out.println("\n--- Dealer macht seinen Zug. ---");
-        while (calculateHand("dealer") < 15) {
+        while (calculateHand("dealer") < calculateHand("player")) {
             this.handDealer.add(getRandomCard());
         }
     }
@@ -235,8 +235,13 @@ public class BlackJackGame extends CasinospielBasis{
             System.out.println("Dealer Punkte: " + calculateHand("dealer"));
             System.out.println("Dein Blatt:   " + formatHandToString("player"));
             System.out.println("Deine Punkte: " + calculateHand("player"));
+            this.gamePhase = GamePhases.EndAndPay;
         }
-        
+
+        if (this.gamePhase == GamePhases.EndAndPay) {
+
+        }
+
         return "";
     }
 
