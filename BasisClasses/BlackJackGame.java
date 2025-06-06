@@ -116,11 +116,11 @@ public class BlackJackGame extends CasinospielBasis{
         return result;
     }
 
-    public void gameResult(){
+    public void gameResult() {
 
     }
 
-    public void playerTurn(){
+    public void playerTurn() {
         System.out.println("\n --- Entscheide dich ---");
             System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
 
@@ -152,7 +152,10 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public void dealerTurn(){
-
+        System.out.println("\n--- Dealer macht seinen Zug. ---");
+        while (calculateHand("dealer") < 15) {
+            this.handDealer.add(getRandomCard());
+        }
     }
 
     public void createDeck(){
@@ -222,6 +225,7 @@ public class BlackJackGame extends CasinospielBasis{
 
         if (this.gamePhase == GamePhases.Decision) {
             this.playerTurn();
+            this.dealerTurn();
         }
         return "";
     }
