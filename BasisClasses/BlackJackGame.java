@@ -226,7 +226,17 @@ public class BlackJackGame extends CasinospielBasis{
         if (this.gamePhase == GamePhases.Decision) {
             this.playerTurn();
             this.dealerTurn();
+            this.gamePhase = GamePhases.Stand;
         }
+
+        if (this.gamePhase == GamePhases.Stand) {
+            System.out.println("\n--- Endstand ---");
+            System.out.println("Dealer Blatt:   " + formatHandToString("dealer"));
+            System.out.println("Dealer Punkte: " + calculateHand("dealer"));
+            System.out.println("Dein Blatt:   " + formatHandToString("player"));
+            System.out.println("Deine Punkte: " + calculateHand("player"));
+        }
+        
         return "";
     }
 
