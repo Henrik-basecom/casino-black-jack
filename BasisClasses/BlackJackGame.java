@@ -121,7 +121,34 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public void playerTurn(){
+        System.out.println("\n --- Entscheide dich ---");
+            System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
 
+            boolean runLoop = true;
+            while (runLoop) {
+                String input = sc.nextLine();
+                
+                if (!input.equals("hit") && !input.equals("stand")) {
+                    System.out.println("Bitte gib 'hit' oder 'stand' ein.");
+                    continue;
+                }
+
+                if (input.equals("hit")) {
+                    String rndCard = getRandomCard();
+                    System.out.println("Du ziehst: " + rndCard);
+                    handPlayer.add(rndCard);
+                    System.out.println("Dein Blatt:   " + formatHandToString("player"));
+                    System.out.println("Deine Punkte: " + calculateHand("player"));
+                    if (calculateHand("player") > 21) {
+                        runLoop = false;
+                        break;
+                    }
+                    System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
+                    continue;
+                }
+
+                runLoop = false;
+            }
     }
 
     public void dealerTurn(){
@@ -188,11 +215,13 @@ public class BlackJackGame extends CasinospielBasis{
             System.out.println("\n--- Karten wurden ausgeteilt ---");
             System.out.println("Dealer zeigt: [" + handDealer.get(0) + "]" + " +  [???]");
             System.out.println("Dein Blatt:   " + formatHandToString("player"));
-            System.out.println("Deine Punkte: " + calculateHand("player") + "\n");
+            System.out.println("Deine Punkte: " + calculateHand("player"));
 
-            // Wechsle zur nächsten Phase (Spieler-Entscheidung)
             this.gamePhase = GamePhases.Decision;
-            System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
+        }
+
+        if (this.gamePhase == GamePhases.Decision) {
+            this.playerTurn();
         }
         return "";
     }
