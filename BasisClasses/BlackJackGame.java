@@ -116,8 +116,18 @@ public class BlackJackGame extends CasinospielBasis{
         return result;
     }
 
-    public void gameResult() {
+    public GameResults gameResult() {
+        int dealerResult = calculateHand("dealer");
+        int playerResult = calculateHand("player");
 
+        if (dealerResult > playerResult) {
+            return GameResults.Lose;
+        }
+        if (dealerResult < playerResult) {
+            return GameResults.Win;
+        }
+
+        return GameResults.Draw;
     }
 
     public void playerTurn() {
