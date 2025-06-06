@@ -7,8 +7,8 @@ public class BlackJackGame extends CasinospielBasis{
     private String[] cards = {"2","3","4","5","6","7","8","9","10","Bube","Dame","König","ASS"};
     private String[] prefixs = {"♠","♥","♦","♣"};
     private ArrayList<String> deck = new ArrayList<String>();
-    private String[] handPlayer;
-    private String[] handDealer;
+    private ArrayList<String> handPlayer = new ArrayList<String>();
+    private ArrayList<String> handDealer =  new ArrayList<String>();
     private int playerBet;
 
 
@@ -30,7 +30,7 @@ public class BlackJackGame extends CasinospielBasis{
           this.playerBet = playerBet;
     }
 
-    public String[] getHandPlayer() {
+    public ArrayList<String> getHandPlayer() {
         return handPlayer;
     }
 
@@ -70,21 +70,41 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public int calculateHand(String hand) {
-        String[] targetHand = hand.equals("player") ? handPlayer : handDealer;
-        int sum = 0;
-        for (String card : targetHand) {
-            if (card == null || card.equals("???")) continue; // Verdeckte Karte ignorieren
+        ArrayList<String> targetHand = hand.equals("player") ? handPlayer : handDealer;
+        int assCount = 0;
+        int tempResult = 0;
 
-            String value = card.split(" ")[1]; // Extrahieren des Kartenwerts (z.B. "♥ 10" → "10")
-            switch (value) {
-                case "ASS":   sum += 11; break; // ASS = 11 (später anpassbar für 1/11)
+        for (String card : targetHand) {
+            String cardValue = card.split(" ")[1]; // Extrahieren des Kartenwerts (z.B. "♥ 10" → "10")
+            switch (cardValue) {
+                case "ASS":   assCount++; break; // ASS = 11 (später anpassbar für 1/11)
                 case "Bube":
                 case "Dame":
-                case "König": sum += 10; break;
-                default:      sum += Integer.parseInt(value); // Zahlenkarten (2-10)
+                case "König": tempResult += 10; break;
+                default:      tempResult += Integer.parseInt(cardValue); // Zahlenkarten (2-10)
             }
         }
-        return sum;
+
+        // Speichere das Ergebniss vorläufig in dem jedes Ass als 1 gewertet wird
+        int result = tempResult + assCount;
+
+        // Checke wie viele Asse zu einer 11 werden können ohne über 21 Punkte zu kommen & update das Ergebniss
+        if (result < 21) {
+            for (int i = 1; i <= assCount; i++) {
+                int tempValue = tempResult + assCount - i + i * 11;
+                if (tempValue == 21) {
+                    result = tempValue;
+                    break;
+                }
+                if (tempValue < 21) {
+                    result = tempValue;
+                    continue;
+                }
+                break;
+            }
+        }
+
+        return result;
     }
 
     public void gameResult(){
@@ -147,22 +167,18 @@ public class BlackJackGame extends CasinospielBasis{
 
 
         if (this.gamePhase == GamePhases.GetCards) {
-            // Initialisiere die Hände (je 2 Karten für Spieler, 2 für Dealer)
-            handPlayer = new String[2];
-            handDealer = new String[2];
+            // Spieler erhält 2 Karten
+            handPlayer.add(getRandomCard());
+            handPlayer.add(getRandomCard());
 
-            // Spieler erhält 2 Karten (offen)
-            handPlayer[0] = getRandomCard();  // Erste Karte
-            handPlayer[1] = getRandomCard();  // Zweite Karte
-
-            // Dealer erhält 1 offene und 1 verdeckte Karte
-            handDealer[0] = getRandomCard();  // Offene Karte
-            handDealer[1] = "???";            // Verdeckte Karte (symbolisch)
+            // Dealer erhält 2 Karten
+            handDealer.add(getRandomCard());
+            handDealer.add(getRandomCard());
 
             // Ausgabe des aktuellen Spielstands
             System.out.println("\n--- Karten wurden ausgeteilt ---");
-            System.out.println("Dealer zeigt: " + handDealer[0] + " + [???]");
-            System.out.println("Dein Blatt:   " + handPlayer[0] + " + " + handPlayer[1]);
+            System.out.println("Dealer zeigt: " + handDealer.get(0) + " + [???]");
+            System.out.println("Dein Blatt:   " + handPlayer.get(0) + " + " + handPlayer.get(1));
             System.out.println("Deine Punkte: " + calculateHand("player") + "\n");
 
             // Wechsle zur nächsten Phase (Spieler-Entscheidung)
