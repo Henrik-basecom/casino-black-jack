@@ -135,7 +135,7 @@ public class BlackJackGame extends CasinospielBasis{
 
             boolean runLoop = true;
             while (runLoop) {
-                String input = sc.nextLine();
+                String input = this.sc.nextLine();
                 
                 if (!input.equals("hit") && !input.equals("stand")) {
                     System.out.println("Bitte gib 'hit' oder 'stand' ein.");
@@ -176,14 +176,14 @@ public class BlackJackGame extends CasinospielBasis{
             } catch (NumberFormatException ex) {
                 System.err.println("Bitte gib nur eine Zahl ein!");
                 System.out.println("Neue Eingabe: ");
-                input = sc.nextLine();
+                input = this.sc.nextLine();
                 continue;
             }
             if (numInput > super.spieler.getJetons() || numInput < 0) {
                 System.err.println("Du musst mindestens 1 Jeton setzen!");
                 System.err.println("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
                 System.out.println("Neue Eingabe: ");
-                input = sc.nextLine();
+                input = this.sc.nextLine();
                 continue;
             }
             checkInput = false;
@@ -278,7 +278,7 @@ public class BlackJackGame extends CasinospielBasis{
                 String input = null;
                 boolean runLoop = true;
                 while (runLoop) {
-                    input = sc.nextLine();
+                    input = this.sc.nextLine();
                     if (!input.equals("start") && !input.equals("exit")) {
                         System.out.println("Bitte gib 'start' oder 'exit' ein.");
                         continue;
@@ -295,7 +295,7 @@ public class BlackJackGame extends CasinospielBasis{
                     System.out.println("\n --- Restart Game ---");
                     System.out.println("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
                     System.out.println("Bitte gib an wie viele Jetons du setzen möchtest: ");
-                    eingabe = sc.nextLine();
+                    eingabe = this.sc.nextLine();
                     this.gamePhase = GamePhases.WelcomeAndBet;
                     continue;
                 }
