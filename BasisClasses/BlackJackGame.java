@@ -65,17 +65,17 @@ public class BlackJackGame extends CasinospielBasis{
         }
     }
 
-    public void resetHand(String hand){
-        if (hand.equals("player")) {
+    public void resetHand(GamePlayers player){
+        if (player == GamePlayers.Player) {
             this.handPlayer.clear();
         }
-        if (hand.equals("dealer")) {
+        if (player == GamePlayers.Dealer) {
             this.handDealer.clear();
         }
     }
 
-    public String formatHandToString(String hand) {
-        ArrayList<String> targetHand = hand.equals("player") ? handPlayer : handDealer;
+    public String formatHandToString(GamePlayers player) {
+        ArrayList<String> targetHand = player == GamePlayers.Player ? handPlayer : handDealer;
         String result = "";
         for (String card : targetHand) {
             result += "[" + card + "]" + " + ";
@@ -83,8 +83,8 @@ public class BlackJackGame extends CasinospielBasis{
         return result.replaceAll(" \\+ $", "");
     }
 
-    public int calculateHand(String hand) {
-        ArrayList<String> targetHand = hand.equals("player") ? handPlayer : handDealer;
+    public int calculateHand(GamePlayers player) {
+        ArrayList<String> targetHand = player == GamePlayers.Player ? handPlayer : handDealer;
         int assCount = 0;
         int tempResult = 0;
 
@@ -122,8 +122,8 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public GameResults gameResult() {
-        int dealerResult = calculateHand("dealer");
-        int playerResult = calculateHand("player");
+        int dealerResult = calculateHand(GamePlayers.Dealer);
+        int playerResult = calculateHand(GamePlayers.Player);
 
         if (playerResult > 21 || (dealerResult > playerResult && dealerResult <= 21)) {
             return GameResults.Lose;
@@ -152,9 +152,9 @@ public class BlackJackGame extends CasinospielBasis{
                     String rndCard = getRandomCard();
                     System.out.println("Du ziehst: " + rndCard);
                     handPlayer.add(rndCard);
-                    System.out.println("Dein Blatt:   " + formatHandToString("player"));
-                    System.out.println("Deine Punkte: " + calculateHand("player"));
-                    if (calculateHand("player") > 21) {
+                    System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
+                    System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
+                    if (calculateHand(GamePlayers.Player) > 21) {
                         runLoop = false;
                         break;
                     }
@@ -168,7 +168,7 @@ public class BlackJackGame extends CasinospielBasis{
 
     public void dealerTurn(){
         System.out.println("\n--- Dealer macht seinen Zug. ---");
-        while (calculateHand("dealer") < calculateHand("player")) {
+        while (calculateHand(GamePlayers.Dealer) < calculateHand(GamePlayers.Player)) {
             this.handDealer.add(getRandomCard());
         }
     }
@@ -239,15 +239,15 @@ public class BlackJackGame extends CasinospielBasis{
                 // Ausgabe des aktuellen Spielstands
                 System.out.println("\n--- Karten wurden ausgeteilt ---");
                 System.out.println("Dealer zeigt: [" + handDealer.get(0) + "]" + " +  [???]");
-                System.out.println("Dein Blatt:   " + formatHandToString("player"));
-                System.out.println("Deine Punkte: " + calculateHand("player"));
+                System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
+                System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
 
                 this.gamePhase = GamePhases.Decision;
             }
 
             if (this.gamePhase == GamePhases.Decision) {
                 this.playerTurn();
-                if (calculateHand("player") <= 21) {
+                if (calculateHand(GamePlayers.Player) <= 21) {
                     this.dealerTurn();
                 }
                 this.gamePhase = GamePhases.Stand;
@@ -255,10 +255,10 @@ public class BlackJackGame extends CasinospielBasis{
 
             if (this.gamePhase == GamePhases.Stand) {
                 System.out.println("\n--- Endstand ---");
-                System.out.println("Dealer Blatt:   " + formatHandToString("dealer"));
-                System.out.println("Dealer Punkte: " + calculateHand("dealer"));
-                System.out.println("Dein Blatt:   " + formatHandToString("player"));
-                System.out.println("Deine Punkte: " + calculateHand("player"));
+                System.out.println("Dealer Blatt:   " + formatHandToString(GamePlayers.Dealer));
+                System.out.println("Dealer Punkte: " + calculateHand(GamePlayers.Dealer));
+                System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
+                System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
                 this.gamePhase = GamePhases.EndAndPay;
             }
 
@@ -300,8 +300,9 @@ public class BlackJackGame extends CasinospielBasis{
 
                 if (input != null && input.equals("start")) {
                     this.resetDeck();
-                    this.resetHand("player");
-                    this.resetHand("dealer");
+                    for (GamePlayers player : GamePlayers.values()) {
+                        this.resetHand(player);
+                    }
 
                     System.out.println("\n --- Restart Game ---");
                     System.out.println("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
