@@ -69,6 +69,15 @@ public class BlackJackGame extends CasinospielBasis{
 
     }
 
+    public String formatHandToString(String hand) {
+        ArrayList<String> targetHand = hand.equals("player") ? handPlayer : handDealer;
+        String result = "";
+        for (String card : targetHand) {
+            result += "[" + card + "]" + " + ";
+        }
+        return result.replaceAll(" \\+ $", "");
+    }
+
     public int calculateHand(String hand) {
         ArrayList<String> targetHand = hand.equals("player") ? handPlayer : handDealer;
         int assCount = 0;
@@ -85,10 +94,10 @@ public class BlackJackGame extends CasinospielBasis{
             }
         }
 
-        // Speichere das Ergebniss vorläufig in dem jedes Ass als 1 gewertet wird
+        // Speichere das Ergebnis vorläufig in dem jedes Ass als 1 gewertet wird
         int result = tempResult + assCount;
 
-        // Checke wie viele Asse zu einer 11 werden können ohne über 21 Punkte zu kommen & update das Ergebniss
+        // Checke wie viele Asse zu einer 11 werden können ohne über 21 Punkte zu kommen & update das Ergebnis
         if (result < 21) {
             for (int i = 1; i <= assCount; i++) {
                 int tempValue = tempResult + assCount - i + i * 11;
@@ -177,8 +186,8 @@ public class BlackJackGame extends CasinospielBasis{
 
             // Ausgabe des aktuellen Spielstands
             System.out.println("\n--- Karten wurden ausgeteilt ---");
-            System.out.println("Dealer zeigt: " + handDealer.get(0) + " + [???]");
-            System.out.println("Dein Blatt:   " + handPlayer.get(0) + " + " + handPlayer.get(1));
+            System.out.println("Dealer zeigt: [" + handDealer.get(0) + "]" + " +  [???]");
+            System.out.println("Dein Blatt:   " + formatHandToString("player"));
             System.out.println("Deine Punkte: " + calculateHand("player") + "\n");
 
             // Wechsle zur nächsten Phase (Spieler-Entscheidung)
