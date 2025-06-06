@@ -30,12 +30,14 @@ public class BlackJackGame extends CasinospielBasis{
           this.playerBet = playerBet;
     }
 
-    public ArrayList<String> getHandPlayer() {
-        return handPlayer;
-    }
-
-    public ArrayList<String> getDeck() {
-        return deck;
+    public ArrayList<String> getHand(GamePlayers player) {
+        if (player == GamePlayers.Player) {
+            return this.handPlayer;
+        }
+        if (player == GamePlayers.Dealer) {
+            return this.handDealer;
+        }
+        return new ArrayList<String>();
     }
 
     public String getRandomCard() {
@@ -46,14 +48,6 @@ public class BlackJackGame extends CasinospielBasis{
         String card = deck.get(randomIndex);
         deck.remove(randomIndex);
         return card;
-    }
-
-    public void removeDeckCard(String card){
-
-    }
-
-    public void addCardToHand(String card, String hand){
-
     }
 
     public void resetDeck(){
@@ -75,7 +69,7 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public String formatHandToString(GamePlayers player) {
-        ArrayList<String> targetHand = player == GamePlayers.Player ? handPlayer : handDealer;
+        ArrayList<String> targetHand = this.getHand(player);
         String result = "";
         for (String card : targetHand) {
             result += "[" + card + "]" + " + ";
@@ -84,7 +78,7 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public int calculateHand(GamePlayers player) {
-        ArrayList<String> targetHand = player == GamePlayers.Player ? handPlayer : handDealer;
+        ArrayList<String> targetHand = this.getHand(player);
         int assCount = 0;
         int tempResult = 0;
 
@@ -122,8 +116,8 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public GameResults gameResult() {
-        int dealerResult = calculateHand(GamePlayers.Dealer);
-        int playerResult = calculateHand(GamePlayers.Player);
+        int dealerResult = this.calculateHand(GamePlayers.Dealer);
+        int playerResult = this.calculateHand(GamePlayers.Player);
 
         if (playerResult > 21 || (dealerResult > playerResult && dealerResult <= 21)) {
             return GameResults.Lose;
@@ -149,12 +143,12 @@ public class BlackJackGame extends CasinospielBasis{
                 }
 
                 if (input.equals("hit")) {
-                    String rndCard = getRandomCard();
+                    String rndCard = this.getRandomCard();
                     System.out.println("Du ziehst: " + rndCard);
-                    handPlayer.add(rndCard);
+                    this.getHand(GamePlayers.Player).add(rndCard);
                     System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
                     System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
-                    if (calculateHand(GamePlayers.Player) > 21) {
+                    if (this.calculateHand(GamePlayers.Player) > 21) {
                         runLoop = false;
                         break;
                     }
@@ -168,13 +162,9 @@ public class BlackJackGame extends CasinospielBasis{
 
     public void dealerTurn(){
         System.out.println("\n--- Dealer macht seinen Zug. ---");
-        while (calculateHand(GamePlayers.Dealer) < calculateHand(GamePlayers.Player)) {
+        while (this.calculateHand(GamePlayers.Dealer) < this.calculateHand(GamePlayers.Player)) {
             this.handDealer.add(getRandomCard());
         }
-    }
-
-    public void createDeck(){
-
     }
 
     public int checkJetonInput(String input) {
@@ -220,7 +210,7 @@ public class BlackJackGame extends CasinospielBasis{
         while (mainGameLoop) {
             if (this.gamePhase == GamePhases.WelcomeAndBet) {
                 int numInput = this.checkJetonInput(eingabe);
-                this.playerBet = numInput;
+                this.setPlayerBet(numInput);
                 super.spieler.removeJetons(this.playerBet);
                 System.out.println("Du hast " + numInput + " Jetons gesetzt.");
                 this.gamePhase = GamePhases.GetCards;
@@ -228,13 +218,11 @@ public class BlackJackGame extends CasinospielBasis{
 
 
             if (this.gamePhase == GamePhases.GetCards) {
-                // Spieler erhält 2 Karten
-                handPlayer.add(getRandomCard());
-                handPlayer.add(getRandomCard());
-
-                // Dealer erhält 2 Karten
-                handDealer.add(getRandomCard());
-                handDealer.add(getRandomCard());
+                // Dealer und Spieler erhalten jeweils 2 Karten
+                for (int i = 0; i < 2; i++) {
+                    this.getHand(GamePlayers.Player).add(getRandomCard());
+                    this.getHand(GamePlayers.Dealer).add(getRandomCard());
+                }
 
                 // Ausgabe des aktuellen Spielstands
                 System.out.println("\n--- Karten wurden ausgeteilt ---");
@@ -268,8 +256,8 @@ public class BlackJackGame extends CasinospielBasis{
                 
                 if (gameResult == GameResults.Win) {
                     System.out.println("Du hast gewonnen \\o/");
-                    System.out.println("Dir werden " + this.playerBet * 2 + " Jetons gutgeschrieben.");
-                    super.spieler.addJetons(this.playerBet * 2);
+                    System.out.println("Dir werden " + this.getPlayerBet() * 2 + " Jetons gutgeschrieben.");
+                    super.spieler.addJetons(this.getPlayerBet() * 2);
                 }
                 if (gameResult == GameResults.Lose) {
                     System.out.println("Du hast leider verloren.");
@@ -278,7 +266,7 @@ public class BlackJackGame extends CasinospielBasis{
                 if (gameResult == GameResults.Draw) {
                     System.out.println("Ein Unentschieden.");
                     System.out.println("Deine gesetzten Jetons werden dir zurückerstattet.");
-                    super.spieler.addJetons(this.playerBet);
+                    super.spieler.addJetons(this.getPlayerBet());
                 }
 
                 if (super.spieler.getJetons() <= 0) {
@@ -322,6 +310,6 @@ public class BlackJackGame extends CasinospielBasis{
 
     @Override
     public void neuesSpiel() {
-
+        // Is not neeeded
     }
 }
