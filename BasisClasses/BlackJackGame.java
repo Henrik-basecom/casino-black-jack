@@ -120,10 +120,10 @@ public class BlackJackGame extends CasinospielBasis{
         int dealerResult = calculateHand("dealer");
         int playerResult = calculateHand("player");
 
-        if (dealerResult > playerResult) {
+        if (playerResult > 21 || (dealerResult > playerResult && dealerResult <= 21)) {
             return GameResults.Lose;
         }
-        if (dealerResult < playerResult) {
+        if (dealerResult > 21 || dealerResult < playerResult) {
             return GameResults.Win;
         }
 
@@ -235,7 +235,9 @@ public class BlackJackGame extends CasinospielBasis{
 
         if (this.gamePhase == GamePhases.Decision) {
             this.playerTurn();
-            this.dealerTurn();
+            if (calculateHand("player") <= 21) {
+                this.dealerTurn();
+            }
             this.gamePhase = GamePhases.Stand;
         }
 
@@ -249,7 +251,17 @@ public class BlackJackGame extends CasinospielBasis{
         }
 
         if (this.gamePhase == GamePhases.EndAndPay) {
+            GameResults gameResult = gameResult();
 
+            if (gameResult == GameResults.Win) {
+                System.out.println("Win");
+            }
+            if (gameResult == GameResults.Lose) {
+                System.out.println("Lose");
+            }
+            if (gameResult == GameResults.Draw) {
+                System.out.println("Draw");
+            }
         }
 
         return "";
