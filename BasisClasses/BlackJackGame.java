@@ -177,6 +177,29 @@ public class BlackJackGame extends CasinospielBasis{
 
     }
 
+    public int checkJetonInput(String input) {
+        Boolean checkInput = true;
+        int numInput = -1;
+        while (checkInput) {
+            try {
+                numInput = Integer.parseInt(input);
+            } catch (NumberFormatException ex) {
+                System.err.println("Bitte gib nur eine Zahl ein!");
+                System.out.println("Neue Eingabe: ");
+                input = sc.nextLine();
+                continue;
+            }
+            if (numInput > super.spieler.getJetons() || numInput < 0) {
+                System.err.println("Du musst mindestens 1 Jeton setzen!");
+                System.err.println("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
+                System.out.println("Neue Eingabe: ");
+                input = sc.nextLine();
+                continue;
+            }
+            checkInput = false;
+        }
+        return numInput;
+    }
 
     @Override
     public String ersteNachricht() {
@@ -196,30 +219,11 @@ public class BlackJackGame extends CasinospielBasis{
         boolean mainGameLoop = true;
         while (mainGameLoop) {
             if (this.gamePhase == GamePhases.WelcomeAndBet) {
-            Boolean checkInput = true;
-            int numInput = -1;
-            while (checkInput) {
-                try {
-                    numInput = Integer.parseInt(eingabe);
-                } catch (NumberFormatException ex) {
-                    System.err.println("Bitte gib nur eine Zahl ein!");
-                    System.out.println("Neue Eingabe: ");
-                    eingabe = sc.nextLine();
-                    continue;
-                }
-                if (numInput > super.spieler.getJetons() || numInput < 0) {
-                    System.err.println("Du musst mindestens 1 Jeton setzen!");
-                    System.err.println("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
-                    System.out.println("Neue Eingabe: ");
-                    eingabe = sc.nextLine();
-                    continue;
-                }
-                checkInput = false;
-            }
-            this.playerBet = numInput;
-            super.spieler.removeJetons(this.playerBet);
-            System.out.println("Du hast " + numInput + " Jetons gesetzt.");
-            this.gamePhase = GamePhases.GetCards;
+                int numInput = this.checkJetonInput(eingabe);
+                this.playerBet = numInput;
+                super.spieler.removeJetons(this.playerBet);
+                System.out.println("Du hast " + numInput + " Jetons gesetzt.");
+                this.gamePhase = GamePhases.GetCards;
             }
 
 
@@ -302,6 +306,7 @@ public class BlackJackGame extends CasinospielBasis{
                     System.out.println("\n --- Restart Game ---");
                     System.out.println("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
                     System.out.println("Bitte gib an wie viele Jetons du setzen möchtest: ");
+                    eingabe = sc.nextLine();
                     this.gamePhase = GamePhases.WelcomeAndBet;
                     continue;
                 }
