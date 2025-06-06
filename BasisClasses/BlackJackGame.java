@@ -65,8 +65,13 @@ public class BlackJackGame extends CasinospielBasis{
         }
     }
 
-    public void resetHand(){
-
+    public void resetHand(String hand){
+        if (hand.equals("player")) {
+            this.handPlayer.clear();
+        }
+        if (hand.equals("dealer")) {
+            this.handDealer.clear();
+        }
     }
 
     public String formatHandToString(String hand) {
@@ -188,7 +193,9 @@ public class BlackJackGame extends CasinospielBasis{
 
     @Override
     public String verarbeiteEingabe(String eingabe) {
-        if (this.gamePhase == GamePhases.WelcomeAndBet) {
+        boolean mainGameLoop = true;
+        while (mainGameLoop) {
+            if (this.gamePhase == GamePhases.WelcomeAndBet) {
             Boolean checkInput = true;
             int numInput = -1;
             while (checkInput) {
@@ -210,61 +217,101 @@ public class BlackJackGame extends CasinospielBasis{
                 checkInput = false;
             }
             this.playerBet = numInput;
+            super.spieler.removeJetons(this.playerBet);
             System.out.println("Du hast " + numInput + " Jetons gesetzt.");
             this.gamePhase = GamePhases.GetCards;
-        }
-
-
-        if (this.gamePhase == GamePhases.GetCards) {
-            // Spieler erhält 2 Karten
-            handPlayer.add(getRandomCard());
-            handPlayer.add(getRandomCard());
-
-            // Dealer erhält 2 Karten
-            handDealer.add(getRandomCard());
-            handDealer.add(getRandomCard());
-
-            // Ausgabe des aktuellen Spielstands
-            System.out.println("\n--- Karten wurden ausgeteilt ---");
-            System.out.println("Dealer zeigt: [" + handDealer.get(0) + "]" + " +  [???]");
-            System.out.println("Dein Blatt:   " + formatHandToString("player"));
-            System.out.println("Deine Punkte: " + calculateHand("player"));
-
-            this.gamePhase = GamePhases.Decision;
-        }
-
-        if (this.gamePhase == GamePhases.Decision) {
-            this.playerTurn();
-            if (calculateHand("player") <= 21) {
-                this.dealerTurn();
             }
-            this.gamePhase = GamePhases.Stand;
-        }
 
-        if (this.gamePhase == GamePhases.Stand) {
-            System.out.println("\n--- Endstand ---");
-            System.out.println("Dealer Blatt:   " + formatHandToString("dealer"));
-            System.out.println("Dealer Punkte: " + calculateHand("dealer"));
-            System.out.println("Dein Blatt:   " + formatHandToString("player"));
-            System.out.println("Deine Punkte: " + calculateHand("player"));
-            this.gamePhase = GamePhases.EndAndPay;
-        }
 
-        if (this.gamePhase == GamePhases.EndAndPay) {
-            GameResults gameResult = gameResult();
+            if (this.gamePhase == GamePhases.GetCards) {
+                // Spieler erhält 2 Karten
+                handPlayer.add(getRandomCard());
+                handPlayer.add(getRandomCard());
 
-            if (gameResult == GameResults.Win) {
-                System.out.println("Win");
+                // Dealer erhält 2 Karten
+                handDealer.add(getRandomCard());
+                handDealer.add(getRandomCard());
+
+                // Ausgabe des aktuellen Spielstands
+                System.out.println("\n--- Karten wurden ausgeteilt ---");
+                System.out.println("Dealer zeigt: [" + handDealer.get(0) + "]" + " +  [???]");
+                System.out.println("Dein Blatt:   " + formatHandToString("player"));
+                System.out.println("Deine Punkte: " + calculateHand("player"));
+
+                this.gamePhase = GamePhases.Decision;
             }
-            if (gameResult == GameResults.Lose) {
-                System.out.println("Lose");
+
+            if (this.gamePhase == GamePhases.Decision) {
+                this.playerTurn();
+                if (calculateHand("player") <= 21) {
+                    this.dealerTurn();
+                }
+                this.gamePhase = GamePhases.Stand;
             }
-            if (gameResult == GameResults.Draw) {
-                System.out.println("Draw");
+
+            if (this.gamePhase == GamePhases.Stand) {
+                System.out.println("\n--- Endstand ---");
+                System.out.println("Dealer Blatt:   " + formatHandToString("dealer"));
+                System.out.println("Dealer Punkte: " + calculateHand("dealer"));
+                System.out.println("Dein Blatt:   " + formatHandToString("player"));
+                System.out.println("Deine Punkte: " + calculateHand("player"));
+                this.gamePhase = GamePhases.EndAndPay;
+            }
+
+            if (this.gamePhase == GamePhases.EndAndPay) {
+                System.out.println("\n--- Ergebnis ---");
+                GameResults gameResult = gameResult();
+                
+                if (gameResult == GameResults.Win) {
+                    System.out.println("Du hast gewonnen \\o/");
+                    System.out.println("Dir werden " + this.playerBet * 2 + " Jetons gutgeschrieben.");
+                    super.spieler.addJetons(this.playerBet * 2);
+                }
+                if (gameResult == GameResults.Lose) {
+                    System.out.println("Du hast leider verloren.");
+                    System.out.println("Deine gesetzten Jetons werden eingezogen");
+                }
+                if (gameResult == GameResults.Draw) {
+                    System.out.println("Ein Unentschieden.");
+                    System.out.println("Deine gesetzten Jetons werden dir zurückerstattet.");
+                    super.spieler.addJetons(this.playerBet);
+                }
+
+                if (super.spieler.getJetons() <= 0) {
+                    System.out.println("Du hast nicht mehr genug Jetons um weiter zu spielen.");
+                    return "Not enough jetons";
+                }
+
+                System.out.println("Möchtest du 'start' (neues Spiel) oder 'exit' (Black Jack verlassen)?");
+                String input = null;
+                boolean runLoop = true;
+                while (runLoop) {
+                    input = sc.nextLine();
+                    if (!input.equals("start") && !input.equals("exit")) {
+                        System.out.println("Bitte gib 'start' oder 'exit' ein.");
+                        continue;
+                    }
+                    runLoop = false;
+                }
+
+                if (input != null && input.equals("start")) {
+                    this.resetDeck();
+                    this.resetHand("player");
+                    this.resetHand("dealer");
+
+                    System.out.println("\n --- Restart Game ---");
+                    System.out.println("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
+                    System.out.println("Bitte gib an wie viele Jetons du setzen möchtest: ");
+                    this.gamePhase = GamePhases.WelcomeAndBet;
+                    continue;
+                }
+
+                System.out.println("Bis zum nächsten mal bei Black Jack!");
+                return "End Game";
             }
         }
-
-        return "";
+        
+        return "This statement should not be reached";
     }
 
     @Override
