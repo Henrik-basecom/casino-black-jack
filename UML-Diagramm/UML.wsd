@@ -48,6 +48,12 @@ class BlackJackGame extends CasinospielBasis{
     - playerTurn(): void;
     - dealerTurn(): void;
     - checkJetonInput(String input): int;
+    - delay(int millisec): void;
+    - delayAfterPrintln(String message): void;
+    - delayAfterPrintln(String message, int millisec): void;
+    - formatHandToString(String input): String;
+    - formatHandToString(GamePlayers player): String;
+    - formatHandToString(String[] input): String;
 }
 
 class GamePhases {
