@@ -22,15 +22,15 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
 
-    public int getPlayerBet() {
+    private int getPlayerBet() {
         return playerBet;
     }
 
-    public void setPlayerBet(int playerBet) {
+    private void setPlayerBet(int playerBet) {
           this.playerBet = playerBet;
     }
 
-    public ArrayList<String> getHand(GamePlayers player) {
+    private ArrayList<String> getHand(GamePlayers player) {
         if (player == GamePlayers.Player) {
             return this.handPlayer;
         }
@@ -40,7 +40,7 @@ public class BlackJackGame extends CasinospielBasis{
         return new ArrayList<String>();
     }
 
-    public String getRandomCard() {
+    private String getRandomCard() {
         if (deck.isEmpty()) {
             resetDeck();
         }
@@ -50,7 +50,7 @@ public class BlackJackGame extends CasinospielBasis{
         return card;
     }
 
-    public void resetDeck(){
+    private void resetDeck(){
         deck.clear();
         for (String prefix : prefixs) {
             for (String card : cards) {
@@ -59,7 +59,7 @@ public class BlackJackGame extends CasinospielBasis{
         }
     }
 
-    public void resetHand(GamePlayers player){
+    private void resetHand(GamePlayers player){
         if (player == GamePlayers.Player) {
             this.handPlayer.clear();
         }
@@ -68,7 +68,7 @@ public class BlackJackGame extends CasinospielBasis{
         }
     } 
 
-    public int calculateHand(GamePlayers player) {
+    private int calculateHand(GamePlayers player) {
         ArrayList<String> targetHand = this.getHand(player);
         int assCount = 0;
         int tempResult = 0;
@@ -106,7 +106,7 @@ public class BlackJackGame extends CasinospielBasis{
         return result;
     }
 
-    public GameResults gameResult() {
+    private GameResults gameResult() {
         int dealerResult = this.calculateHand(GamePlayers.Dealer);
         int playerResult = this.calculateHand(GamePlayers.Player);
 
@@ -120,7 +120,7 @@ public class BlackJackGame extends CasinospielBasis{
         return GameResults.Draw;
     }
 
-    public void playerTurn() {
+    private void playerTurn() {
         this.delayAfterPrintln("\n --- Spielerzug Start ---\n");
         this.delayAfterPrintln("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
 
@@ -154,14 +154,14 @@ public class BlackJackGame extends CasinospielBasis{
         this.delayAfterPrintln("\n --- Spielerzug Ende ---\n");
     }
 
-    public void dealerTurn(){
+    private void dealerTurn(){
         this.delayAfterPrintln("\n--- Dealerzug ---\n");
         while (this.calculateHand(GamePlayers.Dealer) < this.calculateHand(GamePlayers.Player)) {
             this.handDealer.add(getRandomCard());
         }
     }
 
-    public int checkJetonInput(String input) {
+    private int checkJetonInput(String input) {
         Boolean checkInput = true;
         int numInput = -1;
         while (checkInput) {
@@ -185,7 +185,7 @@ public class BlackJackGame extends CasinospielBasis{
         return numInput;
     }
 
-    public void delay(int millisec) {
+    private void delay(int millisec) {
         try {
             Thread.sleep(millisec);
         } catch (InterruptedException e) {
@@ -193,18 +193,18 @@ public class BlackJackGame extends CasinospielBasis{
         }
     }
 
-    public void delayAfterPrintln(String message) {
-        delayAfterPrintln(message, 500);
+    private void delayAfterPrintln(String message) {
+        this.delayAfterPrintln(message, 500);
     }
 
-    public void delayAfterPrintln(String message, int millisec) {
+    private void delayAfterPrintln(String message, int millisec) {
         System.out.println(message);
-        delay(millisec);
+        this.delay(millisec);
     }
 
     private String formatHandToString(String input) {
         String[] tempVal = {input};
-        return formatHandToString(tempVal);
+        return this.formatHandToString(tempVal);
     }
 
     private String formatHandToString(GamePlayers player) {

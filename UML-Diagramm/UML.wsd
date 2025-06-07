@@ -36,18 +36,18 @@ class BlackJackGame extends CasinospielBasis{
 
     + BlackJackGame(Spieler player): void;
 
-    + getPlayerBet(): int;
-    + setPlayerBet(int bet): void;
-    + getHand(GamePlayers player): ArrayList<String>;
-    + getRandomCard(): String;
-    + resetDeck(): void;
-    + resetHand(GamePlayers player): void;
-    + formatHandToString(GamePlayers player): String;
-    + calculateHand(GamePlayers player): int;
-    + gameResult(): void;
-    + playerTurn(): void;
-    + dealerTurn(): void;
-    + checkJetonInput(String input): int;
+    - getPlayerBet(): int;
+    - setPlayerBet(int bet): void;
+    - getHand(GamePlayers player): ArrayList<String>;
+    - getRandomCard(): String;
+    - resetDeck(): void;
+    - resetHand(GamePlayers player): void;
+    - formatHandToString(GamePlayers player): String;
+    - calculateHand(GamePlayers player): int;
+    - gameResult(): void;
+    - playerTurn(): void;
+    - dealerTurn(): void;
+    - checkJetonInput(String input): int;
 }
 
 class GamePhases {
