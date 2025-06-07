@@ -66,18 +66,7 @@ public class BlackJackGame extends CasinospielBasis{
         if (player == GamePlayers.Dealer) {
             this.handDealer.clear();
         }
-    }
-
-    /*
-    public String formatHandToString(GamePlayers player) {
-        ArrayList<String> targetHand = this.getHand(player);
-        String result = "";
-        for (String card : targetHand) {
-            result += "[" + card + "]" + " + ";
-        }
-        return result.replaceAll(" \\+ $", "");
-    }
-    */    
+    } 
 
     public int calculateHand(GamePlayers player) {
         ArrayList<String> targetHand = this.getHand(player);
@@ -87,7 +76,7 @@ public class BlackJackGame extends CasinospielBasis{
         for (String card : targetHand) {
             String cardValue = card.split(" ")[1]; // Extrahieren des Kartenwerts (z.B. "♥ 10" → "10")
             switch (cardValue) {
-                case "A":   assCount++; break; // ASS = 11 (später anpassbar für 1/11)
+                case "A":   assCount++; break; // Ass 1 o. 11
                 case "B":
                 case "D":
                 case "K": tempResult += 10; break;
@@ -298,7 +287,7 @@ public class BlackJackGame extends CasinospielBasis{
                 this.delayAfterPrintln("Dealer Blatt:");
                 System.out.println(formatHandToString(GamePlayers.Dealer));
                 this.delayAfterPrintln("Dealer Punkte: " + calculateHand(GamePlayers.Dealer));
-                this.delayAfterPrintln("Dein Blatt:");
+                this.delayAfterPrintln("\nDein Blatt:");
                 System.out.println(formatHandToString(GamePlayers.Player));
                 this.delayAfterPrintln("Deine Punkte: " + calculateHand(GamePlayers.Player));
                 this.delayAfterPrintln("\n--- Endstand ---\n");
