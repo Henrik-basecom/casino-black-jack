@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class BlackJackGame extends CasinospielBasis{
     private Scanner sc = new Scanner(System.in);
     private GamePhases gamePhase = GamePhases.WelcomeAndBet;
-    private String[] cards = {"2","3","4","5","6","7","8","9","10","Bube","Dame","König","ASS"};
+    private String[] cards = {"2","3","4","5","6","7","8","9","10","B","D","K","A"};
     private String[] prefixs = {"♠","♥","♦","♣"};
     private ArrayList<String> deck = new ArrayList<String>();
     private ArrayList<String> handPlayer = new ArrayList<String>();
@@ -68,6 +69,7 @@ public class BlackJackGame extends CasinospielBasis{
         }
     }
 
+    /*
     public String formatHandToString(GamePlayers player) {
         ArrayList<String> targetHand = this.getHand(player);
         String result = "";
@@ -76,6 +78,7 @@ public class BlackJackGame extends CasinospielBasis{
         }
         return result.replaceAll(" \\+ $", "");
     }
+    */    
 
     public int calculateHand(GamePlayers player) {
         ArrayList<String> targetHand = this.getHand(player);
@@ -85,10 +88,10 @@ public class BlackJackGame extends CasinospielBasis{
         for (String card : targetHand) {
             String cardValue = card.split(" ")[1]; // Extrahieren des Kartenwerts (z.B. "♥ 10" → "10")
             switch (cardValue) {
-                case "ASS":   assCount++; break; // ASS = 11 (später anpassbar für 1/11)
-                case "Bube":
-                case "Dame":
-                case "König": tempResult += 10; break;
+                case "A":   assCount++; break; // ASS = 11 (später anpassbar für 1/11)
+                case "B":
+                case "D":
+                case "K": tempResult += 10; break;
                 default:      tempResult += Integer.parseInt(cardValue); // Zahlenkarten (2-10)
             }
         }
@@ -130,38 +133,41 @@ public class BlackJackGame extends CasinospielBasis{
     }
 
     public void playerTurn() {
-        System.out.println("\n --- Entscheide dich ---");
-            System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
+        this.delayAfterPrintln("\n --- Spielerzug Start ---\n");
+        this.delayAfterPrintln("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
 
-            boolean runLoop = true;
-            while (runLoop) {
-                String input = this.sc.nextLine();
-                
-                if (!input.equals("hit") && !input.equals("stand")) {
-                    System.out.println("Bitte gib 'hit' oder 'stand' ein.");
-                    continue;
-                }
-
-                if (input.equals("hit")) {
-                    String rndCard = this.getRandomCard();
-                    System.out.println("Du ziehst: " + rndCard);
-                    this.getHand(GamePlayers.Player).add(rndCard);
-                    System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
-                    System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
-                    if (this.calculateHand(GamePlayers.Player) > 21) {
-                        runLoop = false;
-                        break;
-                    }
-                    System.out.println("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
-                    continue;
-                }
-
-                runLoop = false;
+        boolean runLoop = true;
+        while (runLoop) {
+            String input = this.sc.nextLine();
+            
+            if (!input.equals("hit") && !input.equals("stand")) {
+                this.delayAfterPrintln("Bitte gib 'hit' oder 'stand' ein.");
+                continue;
             }
+
+            if (input.equals("hit")) {
+                String rndCard = this.getRandomCard();
+                this.delayAfterPrintln("Du ziehst:");
+                System.out.println(this.formatHandToString(rndCard));
+                this.getHand(GamePlayers.Player).add(rndCard);
+                this.delayAfterPrintln("Dein Blatt:");
+                System.out.println(this.formatHandToString(GamePlayers.Player));
+                this.delayAfterPrintln("Deine Punkte: " + calculateHand(GamePlayers.Player));
+                if (this.calculateHand(GamePlayers.Player) > 21) {
+                    runLoop = false;
+                    break;
+                }
+                this.delayAfterPrintln("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
+                continue;
+            }
+
+            runLoop = false;
+        }
+        this.delayAfterPrintln("\n --- Spielerzug Ende ---\n");
     }
 
     public void dealerTurn(){
-        System.out.println("\n--- Dealer macht seinen Zug. ---");
+        this.delayAfterPrintln("\n--- Dealerzug ---\n");
         while (this.calculateHand(GamePlayers.Dealer) < this.calculateHand(GamePlayers.Player)) {
             this.handDealer.add(getRandomCard());
         }
@@ -191,13 +197,56 @@ public class BlackJackGame extends CasinospielBasis{
         return numInput;
     }
 
+    public void delay(int millisec) {
+        try {
+            Thread.sleep(millisec);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delayAfterPrintln(String message) {
+        delayAfterPrintln(message, 500);
+    }
+
+    public void delayAfterPrintln(String message, int millisec) {
+        System.out.println(message);
+        delay(millisec);
+    }
+
+    private String formatHandToString(String input) {
+        String[] tempVal = {input};
+        return formatHandToString(tempVal);
+    }
+
+    private String formatHandToString(GamePlayers player) {
+        return this.formatHandToString(this.getHand(player).toArray(new String[0]));
+    }
+
+    private String formatHandToString(String[] input) {
+        String[] result = {"", "", "", "", ""};
+
+        for (String card : input) {
+            String parts[] = card.split(" ");
+            String prefix = parts[0];
+            String value = parts[1];
+            result[0] += "┌───────┐ ";
+            result[1] += String.format("│%s     │ ", String.format("%-2s", value));
+            result[2] += String.format("│   %s   │ ", prefix);
+            result[3] += String.format("│     %s│ ", String.format("%2s", value));;
+            result[4] += "└───────┘ ";
+        }
+
+        return String.join("\n", result) + "\n";
+    }
+
     @Override
     public String ersteNachricht() {
         return super.spieler.getName() + ", Willkommen bei \n" +
                 "┌───────┐   ┌───────┐\n" +
                 "│10     │   │A      │\n" +
                 "│   ♠   │   │  ♥    │\n" +
-                "│       │   │       │\n" +
+                "│     10│   │      A│\n" +
                 "└───────┘   └───────┘\n" +
                 " B L A C K J A C K\n" +
                 "\nDu verfügst aktuell über " + super.spieler.getJetons() + " Jetons\n" +
@@ -207,12 +256,13 @@ public class BlackJackGame extends CasinospielBasis{
     @Override
     public String verarbeiteEingabe(String eingabe) {
         boolean mainGameLoop = true;
+
         while (mainGameLoop) {
             if (this.gamePhase == GamePhases.WelcomeAndBet) {
                 int numInput = this.checkJetonInput(eingabe);
                 this.setPlayerBet(numInput);
                 super.spieler.removeJetons(this.playerBet);
-                System.out.println("Du hast " + numInput + " Jetons gesetzt.");
+                this.delayAfterPrintln("Du hast " + numInput + " Jetons gesetzt.");
                 this.gamePhase = GamePhases.GetCards;
             }
 
@@ -225,10 +275,13 @@ public class BlackJackGame extends CasinospielBasis{
                 }
 
                 // Ausgabe des aktuellen Spielstands
-                System.out.println("\n--- Karten wurden ausgeteilt ---");
-                System.out.println("Dealer zeigt: [" + handDealer.get(0) + "]" + " +  [???]");
-                System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
-                System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
+                this.delayAfterPrintln("\n--- Karten werden ausgeteilt ---\n");
+                this.delayAfterPrintln("Dealer zeigt:");
+                System.out.println(this.formatHandToString(new String[] {this.handDealer.get(0), "? ?"}));
+                this.delayAfterPrintln("Dein Blatt:");
+                System.out.println(this.formatHandToString(GamePlayers.Player));
+                this.delayAfterPrintln("Deine Punkte: " + this.calculateHand(GamePlayers.Player));
+                this.delayAfterPrintln("\n--- Karten wurden ausgeteilt ---\n");
 
                 this.gamePhase = GamePhases.Decision;
             }
@@ -242,45 +295,49 @@ public class BlackJackGame extends CasinospielBasis{
             }
 
             if (this.gamePhase == GamePhases.Stand) {
-                System.out.println("\n--- Endstand ---");
-                System.out.println("Dealer Blatt:   " + formatHandToString(GamePlayers.Dealer));
-                System.out.println("Dealer Punkte: " + calculateHand(GamePlayers.Dealer));
-                System.out.println("Dein Blatt:   " + formatHandToString(GamePlayers.Player));
-                System.out.println("Deine Punkte: " + calculateHand(GamePlayers.Player));
+                this.delayAfterPrintln("\n--- Endstand ---\n");
+                this.delayAfterPrintln("Dealer Blatt:");
+                System.out.println(formatHandToString(GamePlayers.Dealer));
+                this.delayAfterPrintln("Dealer Punkte: " + calculateHand(GamePlayers.Dealer));
+                this.delayAfterPrintln("Dein Blatt:");
+                System.out.println(formatHandToString(GamePlayers.Player));
+                this.delayAfterPrintln("Deine Punkte: " + calculateHand(GamePlayers.Player));
+                this.delayAfterPrintln("\n--- Endstand ---\n");
                 this.gamePhase = GamePhases.EndAndPay;
             }
 
             if (this.gamePhase == GamePhases.EndAndPay) {
-                System.out.println("\n--- Ergebnis ---");
+                this.delayAfterPrintln("\n--- Ergebnis ---\n");
                 GameResults gameResult = gameResult();
                 
                 if (gameResult == GameResults.Win) {
-                    System.out.println("Du hast gewonnen \\o/");
-                    System.out.println("Dir werden " + this.getPlayerBet() * 2 + " Jetons gutgeschrieben.");
+                    this.delayAfterPrintln("Du hast gewonnen \\o/");
+                    this.delayAfterPrintln("Dir werden " + this.getPlayerBet() * 2 + " Jetons gutgeschrieben.");
                     super.spieler.addJetons(this.getPlayerBet() * 2);
                 }
                 if (gameResult == GameResults.Lose) {
-                    System.out.println("Du hast leider verloren.");
-                    System.out.println("Deine gesetzten Jetons werden eingezogen");
+                    this.delayAfterPrintln("Du hast leider verloren.");
+                    this.delayAfterPrintln("Deine gesetzten Jetons werden eingezogen");
                 }
                 if (gameResult == GameResults.Draw) {
-                    System.out.println("Ein Unentschieden.");
-                    System.out.println("Deine gesetzten Jetons werden dir zurückerstattet.");
+                    this.delayAfterPrintln("Ein Unentschieden.");
+                    this.delayAfterPrintln("Deine gesetzten Jetons werden dir zurückerstattet.");
                     super.spieler.addJetons(this.getPlayerBet());
                 }
+                this.delayAfterPrintln("\n--- Ergebnis ---\n");
 
                 if (super.spieler.getJetons() <= 0) {
-                    System.out.println("Du hast nicht mehr genug Jetons um weiter zu spielen.");
+                    this.delayAfterPrintln("Du hast nicht mehr genug Jetons um weiter zu spielen.");
                     return "Not enough jetons";
                 }
 
-                System.out.println("Möchtest du 'start' (neues Spiel) oder 'exit' (Black Jack verlassen)?");
+                this.delayAfterPrintln("Möchtest du 'start' (neues Spiel) oder 'exit' (Black Jack verlassen)?");;
                 String input = null;
                 boolean runLoop = true;
                 while (runLoop) {
                     input = this.sc.nextLine();
                     if (!input.equals("start") && !input.equals("exit")) {
-                        System.out.println("Bitte gib 'start' oder 'exit' ein.");
+                        this.delayAfterPrintln("Bitte gib 'start' oder 'exit' ein.");;
                         continue;
                     }
                     runLoop = false;
@@ -292,15 +349,15 @@ public class BlackJackGame extends CasinospielBasis{
                         this.resetHand(player);
                     }
 
-                    System.out.println("\n --- Restart Game ---");
-                    System.out.println("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
-                    System.out.println("Bitte gib an wie viele Jetons du setzen möchtest: ");
+                    this.delayAfterPrintln("\n --- Restart Game ---");;
+                    this.delayAfterPrintln("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
+                    this.delayAfterPrintln("Bitte gib an wie viele Jetons du setzen möchtest: ");;
                     eingabe = this.sc.nextLine();
                     this.gamePhase = GamePhases.WelcomeAndBet;
                     continue;
                 }
 
-                System.out.println("Bis zum nächsten mal bei Black Jack!");
+                this.delayAfterPrintln("Bis zum nächsten mal bei Black Jack!");;
                 return "End Game";
             }
         }
