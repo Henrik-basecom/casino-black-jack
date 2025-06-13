@@ -3,6 +3,8 @@ public enum GamePhases{
     GetCards,
     Decision,
     Stand,
-    EndAndPay
+    EndAndPay,
+    PlayerDecision,
+    TestRestart
 }
 
