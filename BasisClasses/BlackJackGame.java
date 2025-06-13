@@ -173,7 +173,7 @@ public class BlackJackGame extends CasinospielBasis{
                 input = this.sc.nextLine();
                 continue;
             }
-            if (numInput > super.spieler.getJetons() || numInput < 0) {
+            if (numInput > super.spieler.getJetons() || numInput <= 0) {
                 System.err.println("Du musst mindestens 1 Jeton setzen!");
                 System.err.println("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
                 System.out.println("Neue Eingabe: ");
