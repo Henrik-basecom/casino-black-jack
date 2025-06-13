@@ -6,7 +6,11 @@ public class Test {
         Spieler henrik = new Spieler("henrik", 100);
         BlackJackGame blackjackgame = new BlackJackGame(henrik);
         System.out.println(blackjackgame.ersteNachricht());
-        String input = sc.nextLine();
-        blackjackgame.verarbeiteEingabe(input);
+        
+        for (int i = 0; i < 100; i++) {
+            String input = sc.nextLine();
+            String tempOut = blackjackgame.verarbeiteEingabe(input);
+            System.out.println(tempOut);
+        }
     }
 }

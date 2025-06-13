@@ -1,8 +1,6 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class BlackJackGame extends CasinospielBasis{
-    private Scanner sc = new Scanner(System.in);
     private GamePhases gamePhase = GamePhases.WelcomeAndBet;
     private String[] cards = {"2","3","4","5","6","7","8","9","10","B","D","K","A"};
     private String[] prefixs = {"♠","♥","♦","♣"};
@@ -10,6 +8,7 @@ public class BlackJackGame extends CasinospielBasis{
     private ArrayList<String> handPlayer = new ArrayList<String>();
     private ArrayList<String> handDealer =  new ArrayList<String>();
     private int playerBet;
+    private StringBuilder output = new StringBuilder();
 
 
     public BlackJackGame(Spieler spieler) {
@@ -120,86 +119,44 @@ public class BlackJackGame extends CasinospielBasis{
         return GameResults.Draw;
     }
 
-    private void playerTurn() {
-        this.delayAfterPrintln("\n --- Spielerzug Start ---\n");
-        this.delayAfterPrintln("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
+    // Funktion gibt true zurück wenn im Interface der output ausgegeben werden soll. False wenn der Code erstmal weiter laufen kann
+    private boolean playerTurn(String eingabe) {
+        output.append("\n--- Spielerzug Start ---\n\n");
+        output.append("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?\n");
 
-        boolean runLoop = true;
-        while (runLoop) {
-            String input = this.sc.nextLine();
-            
-            if (!input.equals("hit") && !input.equals("stand")) {
-                this.delayAfterPrintln("Bitte gib 'hit' oder 'stand' ein.");
-                continue;
-            }
-
-            if (input.equals("hit")) {
-                String rndCard = this.getRandomCard();
-                this.delayAfterPrintln("Du ziehst:");
-                System.out.println(this.formatHandToString(rndCard));
-                this.getHand(GamePlayers.Player).add(rndCard);
-                this.delayAfterPrintln("Dein Blatt:");
-                System.out.println(this.formatHandToString(GamePlayers.Player));
-                this.delayAfterPrintln("Deine Punkte: " + calculateHand(GamePlayers.Player));
-                if (this.calculateHand(GamePlayers.Player) > 21) {
-                    runLoop = false;
-                    break;
-                }
-                this.delayAfterPrintln("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?");
-                continue;
-            }
-
-            runLoop = false;
+        if (this.gamePhase != GamePhases.PlayerDecision) {
+            this.gamePhase = GamePhases.PlayerDecision;
+            return true;
         }
-        this.delayAfterPrintln("\n --- Spielerzug Ende ---\n");
+        
+        if (!eingabe.equals("hit") && !eingabe.equals("stand")) {
+            this.output.append("Die Vorherige eingabe war falsch!");
+            return true;
+        }
+
+        if (eingabe.equals("hit")) {
+            String rndCard = this.getRandomCard();
+            this.output.append("\nDu ziehst:\n");
+            this.output.append("\n" + this.formatHandToString(rndCard) + "\n");
+            this.getHand(GamePlayers.Player).add(rndCard);
+            this.output.append("Dein Blatt:\n");
+            this.output.append("\n" + this.formatHandToString(GamePlayers.Player) + "\n");
+            this.output.append("Deine Punkte: " + calculateHand(GamePlayers.Player) + "\n\n");
+            if (this.calculateHand(GamePlayers.Player) > 21) {
+                return false;
+            }
+            this.output.append("Möchtest du 'hit' (weitere Karte) oder 'stand' (bleiben)?\n");
+            return true;
+        }
+        this.output.append("\n --- Spielerzug Ende ---\n");
+        return false;
     }
 
     private void dealerTurn(){
-        this.delayAfterPrintln("\n--- Dealerzug ---\n");
+        this.output.append("\n--- Dealerzug ---\n");
         while (this.calculateHand(GamePlayers.Dealer) < this.calculateHand(GamePlayers.Player)) {
             this.handDealer.add(getRandomCard());
         }
-    }
-
-    private int checkJetonInput(String input) {
-        Boolean checkInput = true;
-        int numInput = -1;
-        while (checkInput) {
-            try {
-                numInput = Integer.parseInt(input);
-            } catch (NumberFormatException ex) {
-                System.err.println("Bitte gib nur eine Zahl ein!");
-                System.out.println("Neue Eingabe: ");
-                input = this.sc.nextLine();
-                continue;
-            }
-            if (numInput > super.spieler.getJetons() || numInput < 0) {
-                System.err.println("Du musst mindestens 1 Jeton setzen!");
-                System.err.println("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
-                System.out.println("Neue Eingabe: ");
-                input = this.sc.nextLine();
-                continue;
-            }
-            checkInput = false;
-        }
-        return numInput;
-    }
-
-    private void delay(int millisec) {
-        try {
-            Thread.sleep(millisec);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void delayAfterPrintln(String message) {
-        this.delayAfterPrintln(message, 500);
-    }
-
-    private void delayAfterPrintln(String message, int millisec) {
-        System.out.println(message);
-        this.delay(millisec);
     }
 
     private String formatHandToString(String input) {
@@ -243,111 +200,128 @@ public class BlackJackGame extends CasinospielBasis{
 
     @Override
     public String verarbeiteEingabe(String eingabe) {
-        boolean mainGameLoop = true;
+        this.output = new StringBuilder();
 
-        while (mainGameLoop) {
-            if (this.gamePhase == GamePhases.WelcomeAndBet) {
-                int numInput = this.checkJetonInput(eingabe);
-                this.setPlayerBet(numInput);
-                super.spieler.removeJetons(this.playerBet);
-                this.delayAfterPrintln("Du hast " + numInput + " Jetons gesetzt.");
-                this.gamePhase = GamePhases.GetCards;
+        if (this.gamePhase == GamePhases.TestRestart) {
+            if (!eingabe.equals("start") && !eingabe.equals("exit")) {
+                    this.output.append("Bitte gib 'start' oder 'exit' ein.");;
+                    return this.output.toString();
+            }
+            if (eingabe.equals("exit")) {
+                this.output.append("Bis zum nächsten mal bei Black Jack!");
+                return this.output.toString();
             }
 
+            this.output.append("\n --- Restart Game ---\n\n");
+            this.output.append("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons\n");
+            this.output.append("Bitte gib an wie viele Jetons du setzen möchtest: ");
+            this.gamePhase = GamePhases.WelcomeAndBet;
+            return this.output.toString();
+        }
 
-            if (this.gamePhase == GamePhases.GetCards) {
-                // Dealer und Spieler erhalten jeweils 2 Karten
-                for (int i = 0; i < 2; i++) {
-                    this.getHand(GamePlayers.Player).add(getRandomCard());
-                    this.getHand(GamePlayers.Dealer).add(getRandomCard());
-                }
-
-                // Ausgabe des aktuellen Spielstands
-                this.delayAfterPrintln("\n--- Karten werden ausgeteilt ---\n");
-                this.delayAfterPrintln("Dealer zeigt:");
-                System.out.println(this.formatHandToString(new String[] {this.handDealer.get(0), "? ?"}));
-                this.delayAfterPrintln("Dein Blatt:");
-                System.out.println(this.formatHandToString(GamePlayers.Player));
-                this.delayAfterPrintln("Deine Punkte: " + this.calculateHand(GamePlayers.Player));
-                this.delayAfterPrintln("\n--- Karten wurden ausgeteilt ---\n");
-
-                this.gamePhase = GamePhases.Decision;
+        if (this.gamePhase == GamePhases.WelcomeAndBet) {
+            if (super.spieler.getJetons() <= 0) {
+                return "Du hast nicht mehr genug Jetons um weiter zu spielen!";
             }
 
-            if (this.gamePhase == GamePhases.Decision) {
-                this.playerTurn();
-                if (calculateHand(GamePlayers.Player) <= 21) {
-                    this.dealerTurn();
-                }
-                this.gamePhase = GamePhases.Stand;
+            int numInput = -1;
+
+            try {
+                numInput = Integer.parseInt(eingabe);
+            } catch (NumberFormatException e) {
+                return "Bitte gib nur eine Zahl an!";
             }
 
-            if (this.gamePhase == GamePhases.Stand) {
-                this.delayAfterPrintln("\n--- Endstand ---\n");
-                this.delayAfterPrintln("Dealer Blatt:");
-                System.out.println(formatHandToString(GamePlayers.Dealer));
-                this.delayAfterPrintln("Dealer Punkte: " + calculateHand(GamePlayers.Dealer));
-                this.delayAfterPrintln("\nDein Blatt:");
-                System.out.println(formatHandToString(GamePlayers.Player));
-                this.delayAfterPrintln("Deine Punkte: " + calculateHand(GamePlayers.Player));
-                this.delayAfterPrintln("\n--- Endstand ---\n");
-                this.gamePhase = GamePhases.EndAndPay;
+            if (numInput > super.spieler.getJetons() || numInput <= 0) {
+                this.output.append("Du musst mindestens 1 Jeton setzen!\n");
+                this.output.append("Du kannst nur maximal " + super.spieler.getJetons() + " Jetons setzen!");
+                return this.output.toString();
             }
 
-            if (this.gamePhase == GamePhases.EndAndPay) {
-                this.delayAfterPrintln("\n--- Ergebnis ---\n");
-                GameResults gameResult = gameResult();
-                
-                if (gameResult == GameResults.Win) {
-                    this.delayAfterPrintln("Du hast gewonnen \\o/");
-                    this.delayAfterPrintln("Dir werden " + this.getPlayerBet() * 2 + " Jetons gutgeschrieben.");
-                    super.spieler.addJetons(this.getPlayerBet() * 2);
-                }
-                if (gameResult == GameResults.Lose) {
-                    this.delayAfterPrintln("Du hast leider verloren.");
-                    this.delayAfterPrintln("Deine gesetzten Jetons werden eingezogen");
-                }
-                if (gameResult == GameResults.Draw) {
-                    this.delayAfterPrintln("Ein Unentschieden.");
-                    this.delayAfterPrintln("Deine gesetzten Jetons werden dir zurückerstattet.");
-                    super.spieler.addJetons(this.getPlayerBet());
-                }
-                this.delayAfterPrintln("\n--- Ergebnis ---\n");
+            this.setPlayerBet(numInput);
+            super.spieler.removeJetons(this.playerBet);
+            this.output.append("Du hast " + numInput + " Jetons gesetzt.");
+            this.gamePhase = GamePhases.GetCards;
+        }
 
-                if (super.spieler.getJetons() <= 0) {
-                    this.delayAfterPrintln("Du hast nicht mehr genug Jetons um weiter zu spielen.");
-                    return "Not enough jetons";
-                }
 
-                this.delayAfterPrintln("Möchtest du 'start' (neues Spiel) oder 'exit' (Black Jack verlassen)?");;
-                String input = null;
-                boolean runLoop = true;
-                while (runLoop) {
-                    input = this.sc.nextLine();
-                    if (!input.equals("start") && !input.equals("exit")) {
-                        this.delayAfterPrintln("Bitte gib 'start' oder 'exit' ein.");;
-                        continue;
-                    }
-                    runLoop = false;
-                }
-
-                if (input != null && input.equals("start")) {
-                    this.resetDeck();
-                    for (GamePlayers player : GamePlayers.values()) {
-                        this.resetHand(player);
-                    }
-
-                    this.delayAfterPrintln("\n --- Restart Game ---");;
-                    this.delayAfterPrintln("Du verfügst aktuell über " + super.spieler.getJetons() + " Jetons");
-                    this.delayAfterPrintln("Bitte gib an wie viele Jetons du setzen möchtest: ");;
-                    eingabe = this.sc.nextLine();
-                    this.gamePhase = GamePhases.WelcomeAndBet;
-                    continue;
-                }
-
-                this.delayAfterPrintln("Bis zum nächsten mal bei Black Jack!");;
-                return "End Game";
+        if (this.gamePhase == GamePhases.GetCards) {
+            this.resetDeck();
+            for (GamePlayers player : GamePlayers.values()) {
+                this.resetHand(player);
             }
+
+            // Dealer und Spieler erhalten jeweils 2 Karten
+            for (int i = 0; i < 2; i++) {
+                this.getHand(GamePlayers.Player).add(getRandomCard());
+                this.getHand(GamePlayers.Dealer).add(getRandomCard());
+            }
+
+            // Ausgabe des aktuellen Spielstands
+            this.output.append("\n\n--- Karten werden ausgeteilt ---\n\n");
+            this.output.append("Dealer zeigt:\n");
+            this.output.append("\n" + this.formatHandToString(new String[] {this.handDealer.get(0), "? ?"}) + "\n");
+            this.output.append("Dein Blatt:\n");
+            this.output.append("\n" + this.formatHandToString(GamePlayers.Player) + "\n");
+            this.output.append("Deine Punkte: " + this.calculateHand(GamePlayers.Player));
+            this.output.append("\n\n--- Karten wurden ausgeteilt ---\n");
+
+            this.gamePhase = GamePhases.Decision;
+        }
+
+        if (this.gamePhase == GamePhases.Decision || this.gamePhase == GamePhases.PlayerDecision) {
+            boolean tempVal = this.playerTurn(eingabe);
+            if (tempVal) {
+                return this.output.toString();
+            }
+
+            if (calculateHand(GamePlayers.Player) <= 21) {
+                this.dealerTurn();
+            }
+            this.gamePhase = GamePhases.Stand;
+        }
+
+        if (this.gamePhase == GamePhases.Stand) {
+            this.output.append("\n--- Endstand ---\n\n");
+            this.output.append("Dealer Blatt:\n");
+            this.output.append("\n" + formatHandToString(GamePlayers.Dealer) + "\n");
+            this.output.append("Dealer Punkte: " + calculateHand(GamePlayers.Dealer) + "\n");
+            this.output.append("\nDein Blatt:\n");
+            this.output.append("\n" + formatHandToString(GamePlayers.Player) + "\n");
+            this.output.append("Deine Punkte: " + calculateHand(GamePlayers.Player) + "\n");
+            this.output.append("\n--- Endstand ---\n");
+            this.gamePhase = GamePhases.EndAndPay;
+        }
+
+        if (this.gamePhase == GamePhases.EndAndPay) {
+            this.output.append("\n--- Ergebnis ---\n\n");
+            GameResults gameResult = gameResult();
+            
+            if (gameResult == GameResults.Win) {
+                this.output.append("Du hast gewonnen \\o/\n");
+                this.output.append("Dir werden " + this.getPlayerBet() * 2 + " Jetons gutgeschrieben.");
+                super.spieler.addJetons(this.getPlayerBet() * 2);
+            }
+            if (gameResult == GameResults.Lose) {
+                this.output.append("Du hast leider verloren.\n");
+                this.output.append("Deine gesetzten Jetons werden eingezogen");
+            }
+            if (gameResult == GameResults.Draw) {
+                this.output.append("Ein Unentschieden.\n");
+                this.output.append("Deine gesetzten Jetons werden dir zurückerstattet.");
+                super.spieler.addJetons(this.getPlayerBet());
+            }
+            this.output.append("\n\n--- Ergebnis ---\n\n");
+
+            if (super.spieler.getJetons() <= 0) {
+                this.output.append("Du hast nicht mehr genug Jetons um weiter zu spielen.");
+                this.gamePhase = GamePhases.WelcomeAndBet;
+                return this.output.toString();
+            }
+
+            this.output.append("Möchtest du 'start' (neues Spiel) oder 'exit' (Black Jack verlassen)?");;
+            this.gamePhase = GamePhases.TestRestart;
+            return this.output.toString();
         }
         
         return "This statement should not be reached";
